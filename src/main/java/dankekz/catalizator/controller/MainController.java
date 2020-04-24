@@ -1,31 +1,29 @@
 package dankekz.catalizator.controller;
 
 import dankekz.catalizator.domain.Message;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import dankekz.catalizator.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/controller")
 public class MainController {
+
+    private final MessageService messageService;
 
     @GetMapping
     public Flux<Message> getMessages(
             @RequestParam(defaultValue = "0") Long start,
             @RequestParam(defaultValue = "3") Long count
     ) {
-        return Flux
-                .just(
-                        "Hello, reactive",
-                        "More than one",
-                        "Third post",
-                        "Fourth post",
-                        "Fifth post"
-                )
-                .skip(start)
-                .take(count)
-                .map(Message::new);
+        return messageService.list();
+    }
+
+    @PostMapping
+    public Mono<Message> add(@RequestBody Message message) {
+        return messageService.addOne(message);
     }
 }
